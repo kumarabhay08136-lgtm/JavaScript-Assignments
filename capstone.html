@@ -1,0 +1,426 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StockFlow | Inventory Dashboard</title>
+
+<style>
+:root {
+    --bg: #f4f7fb;
+    --card: #ffffff;
+    --text: #172033;
+    --muted: #718096;
+    --primary: #4f46e5;
+    --border: #e7ebf2;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    font-family: Inter, "Segoe UI", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+}
+
+header {
+    background: #111827;
+    color: white;
+    padding: 22px 6%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.brand { font-size: 24px; font-weight: 800; }
+.brand span { color: #818cf8; }
+
+header p { color: #cbd5e1; margin: 6px 0 0; font-size: 13px; }
+
+main { max-width: 1200px; margin: auto; padding: 30px 20px; }
+
+.welcome {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+}
+
+h1 { margin: 0 0 8px; font-size: 28px; }
+.subtitle { color: var(--muted); margin: 0; }
+
+.badge {
+    background: #e0e7ff;
+    color: #4338ca;
+    border-radius: 30px;
+    padding: 9px 14px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    margin-bottom: 24px;
+}
+
+.card {
+    background: var(--card);
+    padding: 22px;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: 0 5px 20px #17203308;
+}
+
+.stat-label { color: var(--muted); font-size: 14px; }
+.stat-value { font-size: 29px; font-weight: 800; margin-top: 12px; }
+.stat-icon { font-size: 23px; margin-bottom: 14px; }
+
+.layout {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 20px;
+    align-items: start;
+}
+
+h2 { font-size: 18px; margin: 0 0 18px; }
+
+input, select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #dce2eb;
+    border-radius: 9px;
+    background: white;
+    color: var(--text);
+    outline: none;
+    margin-top: 7px;
+}
+
+input:focus, select:focus { border-color: var(--primary); }
+
+label { font-size: 13px; font-weight: 600; }
+
+.field { margin-bottom: 14px; }
+
+button {
+    border: 0;
+    border-radius: 9px;
+    padding: 11px 15px;
+    cursor: pointer;
+    font-weight: 700;
+    transition: .2s;
+}
+
+button:hover { transform: translateY(-1px); }
+
+.primary { background: var(--primary); color: white; }
+.secondary { background: #eef2ff; color: #4338ca; }
+.delete { background: #fee2e2; color: #b91c1c; padding: 7px 10px; }
+
+.actions { display: flex; gap: 9px; flex-wrap: wrap; margin-top: 10px; }
+
+.toolbar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.toolbar input { margin: 0; }
+.toolbar select { margin: 0; max-width: 150px; }
+
+.table-wrap { overflow-x: auto; }
+
+table { width: 100%; border-collapse: collapse; min-width: 490px; }
+th, td { text-align: left; padding: 14px 10px; border-bottom: 1px solid var(--border); font-size: 13px; }
+th { color: var(--muted); font-weight: 600; }
+td { font-weight: 500; }
+
+.category {
+    display: inline-block;
+    padding: 5px 9px;
+    border-radius: 20px;
+    background: #e0e7ff;
+    color: #4338ca;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.empty { text-align: center; padding: 25px; color: var(--muted); }
+
+.report-line {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 13px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+}
+
+.report-line strong { text-align: right; }
+.total { font-size: 18px; color: var(--primary); font-weight: 800; }
+
+#message { margin-top: 12px; font-size: 13px; color: #047857; }
+footer { text-align: center; padding: 25px; color: var(--muted); font-size: 12px; }
+
+@media (max-width: 760px) {
+    .stats { grid-template-columns: 1fr; }
+    .layout { grid-template-columns: 1fr; }
+    h1 { font-size: 23px; }
+    main { padding: 22px 14px; }
+}
+</style>
+</head>
+
+<body>
+<header>
+    <div>
+        <div class="brand">Stock<span>Flow.</span></div>
+        <p>Smart Product & Inventory Management</p>
+    </div>
+    <div class="badge">JAVASCRIPT PROJECT</div>
+</header>
+
+<main>
+    <section class="welcome">
+        <div>
+            <h1>Inventory Dashboard</h1>
+            <p class="subtitle">Manage products, track value and generate reports.</p>
+        </div>
+        <div class="badge">● Dashboard Active</div>
+    </section>
+
+    <section class="stats">
+        <div class="card">
+            <div class="stat-icon">📦</div>
+            <div class="stat-label">Total Products</div>
+            <div class="stat-value" id="productCount">0</div>
+        </div>
+        <div class="card">
+            <div class="stat-icon">💰</div>
+            <div class="stat-label">Inventory Value</div>
+            <div class="stat-value" id="inventoryValue">$0.00</div>
+        </div>
+        <div class="card">
+            <div class="stat-icon">🏷️</div>
+            <div class="stat-label">Budget Products</div>
+            <div class="stat-value" id="budgetCount">0</div>
+        </div>
+    </section>
+
+    <section class="layout">
+        <div class="card">
+            <h2>Product Inventory</h2>
+
+            <div class="toolbar">
+                <input id="search" type="text" placeholder="Search products..." oninput="displayProducts()">
+                <select id="filter" onchange="displayProducts()">
+                    <option value="all">All prices</option>
+                    <option value="budget">Under $50</option>
+                    <option value="standard">$50–$199</option>
+                    <option value="premium">$200+</option>
+                </select>
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>PRODUCT</th>
+                            <th>PRICE</th>
+                            <th>CATEGORY</th>
+                            <th>ACTION</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productRows"></tbody>
+                </table>
+            </div>
+            <p id="emptyMessage" class="empty" hidden>No products found.</p>
+        </div>
+
+        <div>
+            <div class="card">
+                <h2>Add New Product</h2>
+                <form id="productForm">
+                    <div class="field">
+                        <label for="name">Product Name</label>
+                        <input id="name" type="text" placeholder="e.g. Keyboard" required maxlength="60">
+                    </div>
+                    <div class="field">
+                        <label for="price">Price ($)</label>
+                        <input id="price" type="number" placeholder="e.g. 49.99" min="0.01" step="0.01" required>
+                    </div>
+                    <button class="primary" type="submit">+ Add Product</button>
+                    <div id="message" role="status"></div>
+                </form>
+            </div>
+
+            <div class="card" style="margin-top:20px">
+                <h2>Financial Summary</h2>
+                <div class="report-line"><span>Subtotal</span><strong id="subtotal">$0.00</strong></div>
+                <div class="report-line"><span>Tax (10%)</span><strong id="tax">$0.00</strong></div>
+                <div class="report-line"><span>Discount (5%)</span><strong id="discount">$0.00</strong></div>
+                <div class="report-line"><span>Final Total</span><strong class="total" id="finalTotal">$0.00</strong></div>
+                <button class="secondary" style="margin-top:16px;width:100%" onclick="generateReport()">Generate Full Report</button>
+                <p id="report" style="white-space:pre-line;line-height:1.7;font-size:13px"></p>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer>StockFlow Inventory Dashboard · Built with HTML, CSS & JavaScript</footer>
+
+<script>
+const products = [
+    { id: 1, name: "Laptop", price: 800 },
+    { id: 2, name: "Wireless Mouse", price: 25 },
+    { id: 3, name: "Keyboard", price: 45 },
+    { id: 4, name: "Headphones", price: 120 }
+];
+
+let nextId = 5;
+
+function getCategory(price) {
+    if (price < 50) return "Budget";
+    if (price < 200) return "Standard";
+    return "Premium";
+}
+
+function formatMoney(amount) {
+    return "$" + amount.toFixed(2);
+}
+
+function displayProducts() {
+    const searchText = document.getElementById("search").value.toLowerCase();
+    const selectedFilter = document.getElementById("filter").value;
+
+    const filteredProducts = products.filter(function(product) {
+        const matchesName = product.name.toLowerCase().includes(searchText);
+        const category = getCategory(product.price).toLowerCase();
+        const matchesCategory = selectedFilter === "all" || category === selectedFilter;
+        return matchesName && matchesCategory;
+    });
+
+    const rows = document.getElementById("productRows");
+    rows.innerHTML = "";
+
+    filteredProducts.forEach(function(product) {
+        const row = document.createElement("tr");
+
+        const nameCell = document.createElement("td");
+        nameCell.textContent = product.name;
+
+        const priceCell = document.createElement("td");
+        priceCell.textContent = formatMoney(product.price);
+
+        const categoryCell = document.createElement("td");
+        const badge = document.createElement("span");
+        badge.className = "category";
+        badge.textContent = getCategory(product.price);
+        categoryCell.appendChild(badge);
+
+        const actionCell = document.createElement("td");
+        const deleteButton = document.createElement("button");
+        deleteButton.className = "delete";
+        deleteButton.textContent = "Delete";
+        deleteButton.onclick = function() {
+            deleteProduct(product.id);
+        };
+        actionCell.appendChild(deleteButton);
+
+        row.append(nameCell, priceCell, categoryCell, actionCell);
+        rows.appendChild(row);
+    });
+
+    document.getElementById("emptyMessage").hidden = filteredProducts.length !== 0;
+
+    updateSummary();
+}
+
+function addProduct(event) {
+    event.preventDefault();
+
+    const name = document.getElementById("name").value.trim();
+    const priceText = document.getElementById("price").value;
+    const price = Number(priceText);
+
+    if (!name || priceText === "" || !Number.isFinite(price) || price <= 0) {
+        document.getElementById("message").textContent =
+            "Please enter a valid name and a price greater than zero.";
+        return;
+    }
+
+    products.push({ id: nextId++, name: name, price: price });
+
+    document.getElementById("productForm").reset();
+    document.getElementById("message").textContent = "Product added successfully!";
+    displayProducts();
+}
+
+function deleteProduct(id) {
+    const index = products.findIndex(function(product) {
+        return product.id === id;
+    });
+
+    if (index !== -1) {
+        products.splice(index, 1);
+        displayProducts();
+    }
+}
+
+function calculateTotal(items) {
+    return items.reduce(function(total, product) {
+        return total + product.price;
+    }, 0);
+}
+
+function updateSummary() {
+    const total = calculateTotal(products);
+    const budgetProducts = products.filter(function(product) {
+        return product.price < 50;
+    });
+
+    const taxAmount = total * 0.10;
+    const discountAmount = total * 0.05;
+
+    document.getElementById("productCount").textContent = products.length;
+    document.getElementById("inventoryValue").textContent = formatMoney(total);
+    document.getElementById("budgetCount").textContent = budgetProducts.length;
+    document.getElementById("subtotal").textContent = formatMoney(total);
+    document.getElementById("tax").textContent = formatMoney(taxAmount);
+    document.getElementById("discount").textContent = formatMoney(discountAmount);
+    document.getElementById("finalTotal").textContent =
+        formatMoney(total + taxAmount - discountAmount);
+}
+
+function generateReport() {
+    const total = calculateTotal(products);
+
+    const affordableProducts = products.filter(function(product) {
+        return product.price < 200;
+    });
+
+    const productNames = products.map(function(product) {
+        return product.name.toUpperCase() + " — " + formatMoney(product.price);
+    });
+
+    document.getElementById("report").textContent =
+        "Inventory Report\n" +
+        "Total products: " + products.length + "\n" +
+        "Inventory value: " + formatMoney(total) + "\n" +
+        "Products under $200: " + affordableProducts.length + "\n\n" +
+        "Product list:\n" + (productNames.join("\n") || "No products available");
+}
+
+document.getElementById("productForm").addEventListener("submit", addProduct);
+
+displayProducts();
+</script>
+</body>
+</html>
